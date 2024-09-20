@@ -6,6 +6,8 @@ try:
     remote_port = 9333
     chrome1 = ChromeAuto.ChromeInit(
         remote_port=remote_port,
+        # windows使用这个路径：
+        # chrome_path=os.path.join("C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"),
         chrome_path="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
         cache_dir=os.path.join(f"ChromeData/{remote_port}"),
         clear_cache=False,
