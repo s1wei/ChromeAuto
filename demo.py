@@ -1,10 +1,23 @@
+#!/usr/bin/python3
+# _*_ coding: utf-8 _*_
+"""
+Copyright (C) 2024 - s1wei.com, Inc. All Rights Reserved 
+
+@Time    : 2024/9/20 下午5:50
+@Author  : s1wei
+@Email   : admin@s1wei.com
+@Blog    : https://www.denceun.cn/author/1/
+@File    : 001、创建浏览器，标签页操作.py
+@IDE     : PyCharm
+"""
+
 import os
 import ChromeAuto
 
 # 示例调用
 try:
     remote_port = 9333
-    chrome1 = ChromeAuto.ChromeInit(
+    chrome_example = ChromeAuto.ChromeInit(
         remote_port=remote_port,
         # windows使用这个路径：
         # chrome_path=os.path.join("C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"),
@@ -23,72 +36,46 @@ try:
             "lang": "zh-CN",  # 设置语言
             "incognito": False,  # 无痕模式
             "disable_js": False,  # 禁用Javascript
-            "window_size": (800, 600),  # 窗口宽度、高度
-            "window_position": (0, 0)  # 窗口位置x、y
+            "window_size": (1200, 800),  # 窗口宽度、高度
+            "window_position": (50, 50)  # 窗口位置x、y
         },
-        home_url="https://www.denceun.cn",
+        home_url="https://www.denceun.cn",  # 默认启动页
         timeout=60,
         launch_mode=0
     )
 
-    # 获取所有标签页信息
-    current_all_tab = chrome1.getAllTabInfo()
-    if current_all_tab:
-        print(f"当前所有标签页信息: {current_all_tab}")
+    # 获取当前标签页信息
+    one_tab = chrome_example.getTabInfo()
+    # 等待标签页加载完毕
+    chrome_example.wait_until_page_loaded(tab=one_tab, timeout=20)
+    one_tab = chrome_example.getTabInfo()
+    print(f"标签1:{one_tab}")
 
-    # 新建标签页并导航到指定URL
-    new_tab = chrome1.createNewTab("https://www.s1wei.com")
-    if new_tab:
-        print(f"新建标签页信息: {new_tab}")
-    else:
-        print("新建标签页失败")
+    # 新建标签页，并且跳转到 https://www.github.com/s1wei 地址
+    new_tab = chrome_example.createNewTab("https://www.s1wei.com")
+    two_tab = chrome_example.getTabInfo()
+    # chrome_example.wait_until_page_loaded(tab=two_tab, timeout=20)
+    print(f"标签2:{two_tab}")
 
-    # 等待新标签页的页面加载完毕
-    if new_tab:
-        if chrome1.wait_until_page_loaded(tab=new_tab):
-            print("页面已加载完毕。")
-        else:
-            print("页面加载超时或发生错误。")
+    # 切换到第一页
+    chrome_example.switchToTab(one_tab)
+    chrome_example.RunJavaScript("alert('当前已切换到one_tab')", one_tab)
 
-    # 获取当前所有标签页信息（数组）
-    current_all_tab = chrome1.getAllTabInfo()
-    if current_all_tab:
-        print(f"当前所有标签页信息: {current_all_tab}")
+    # 获取所有标签并输出
+    all_tab = chrome_example.getAllTabInfo()
+    print(f"所有标签:{all_tab}")
 
-    # 在新建的标签页中执行 JavaScript 代码
-    if new_tab:
-        chrome1.RunJavaScript("alert('新标签页执行JS')", tab=new_tab)
-    else:
-        print("无法在新建的标签页中执行 JavaScript 代码，因为标签页创建失败。")
+    # 引用数组下标，切换到第二页
+    chrome_example.switchToTab(all_tab[1])
+    chrome_example.RunJavaScript("alert('当前已切换到two_tab')", two_tab)
 
-    # 切换回初始标签页
-    init_tab = current_all_tab[0]
-    if chrome1.switchToTab(init_tab) == 1:
-        print(f"成功切换回初始标签页: {init_tab}")
-    else:
-        print("切换回初始标签页失败")
+    # 引用数组下标，关闭第一页
+    chrome_example.closeTab(all_tab[0])
+    chrome_example.RunJavaScript("alert('已关闭one_tab')", two_tab)
 
-    # 在初始标签页中执行JavaScript代码
-    if init_tab:
-        chrome1.RunJavaScript("alert('初始标签页执行JS')", tab=init_tab)
-    else:
-        print("在一开始标签页中执行 JavaScript 代码。")
-
-    # 关闭新建的标签页
-    if init_tab and chrome1.closeTab(init_tab) == 1:
-        print(f"成功关闭最初标签页: {init_tab}")
-    else:
-        print("关闭标签页失败")
-
-    # 截取新标签页的截图并保存到指定目录
-    if new_tab:
-        chrome1.capture_screenshot(save_dir='./Picture', filename='s1wei.png', tab=new_tab)
-    else:
-        print("无法截取截图，因为标签页创建失败。")
-
-    # 关闭整个浏览器
-    chrome1.close()
+    # 关闭整个浏览器实例
+    chrome_example.RunJavaScript("alert('接下来关闭整个浏览器实例')")
+    chrome_example.close()
 
 except Exception as e:
     print(e)
-
