@@ -120,6 +120,7 @@ class ChromeInit:
             cmd_line.append(f"--window-position={x},{y}")
 
         cmd_line.append("--disable-popup-blocking")  # 允许弹出新窗口
+        cmd_line.append("--log-level=3")  # 添加日志级别设置
 
         return cmd_line
 
@@ -161,11 +162,14 @@ class ChromeInit:
         response = await websocket.recv()
         return json.loads(response)
 
-    def send_command_sync(self, method, params=None, ws_url=None):
+    def send_command_sync(self, method, params=None, ws_url=None, tab=None):
         if params is None:
             params = {}
         if ws_url is None:
-            ws_url = self.ws_url
+            if tab:
+                ws_url = tab.ws_url or self.get_ws_url_by_tab(tab)
+            else:
+                ws_url = self.ws_url
         result = {}
 
         async def inner():
@@ -196,6 +200,10 @@ class ChromeInit:
 
     def RunJavaScript(self, script, tab=None):
         result = asyncio.run(self.run_javascript(script, tab))
+        return result
+
+    def RunJavaScriptWithParams(self, params, tab=None):
+        result = self.send_command_sync('Runtime.evaluate', params, tab=tab)
         return result
 
     def get_ws_url_by_tab(self, tab):
@@ -261,7 +269,7 @@ class ChromeInit:
             )
             tab_list.append(tab_obj)
         # 反转列表，使最早的标签页在前
-        tab_list.reverse()
+        # tab_list.reverse()
         return tab_list
 
     def createNewTab(self, url):
