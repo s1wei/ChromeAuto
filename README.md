@@ -129,8 +129,8 @@ except Exception as e:
 
 ## 贡献
 欢迎提交问题和请求。您可以通过以下方式参与项目：
-* 提交问题（Issue）
-* 提交拉取请求（Pull Request）
+* ![提交问题（Issue）](https://github.com/s1wei/ChromeAuto/issues)
+* ![提交拉取请求（Pull Request）](https://github.com/s1wei/ChromeAuto/pulls)
 * 改进文档
 
 ## 联系
